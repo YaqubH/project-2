@@ -1,0 +1,25 @@
+- Member Info:
+  Member name 
+  Membership number 
+  Membership type 
+  Membership expiration date 
+  Total amount spent (running total) 
+  Rebate amount (Executive members only) 
+
+- Warehouse Shoppers Info:
+  Customer name   
+  Customer membership number   
+  Type of customer – Regular or Executive
+  Membership expiration date
+
+
+- Purchase date 
+  Customer membership number   
+  Item purchased 
+  Sales price quantity purchased  
+
+- Seven Files:
+  Purchase date 
+  Customer membership number   
+  Item purchased 
+  Sales price quantity purchased 
