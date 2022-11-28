@@ -1,3 +1,2 @@
 # CS1C-Project-2-Bulk-Club
-Team Baked Potatoes
-Trying out git
+CS1C Bulk Club Project 2
