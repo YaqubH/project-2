@@ -1,13 +1,23 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "dbmanager.h"
-
+#include "Admin.h"
+#include "Manager.h"
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent),
-      ui(new Ui::MainWindow)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
 {
-    // adminUi = new Ui::AdminPage;
     ui->setupUi(this);
+
+    connect(ui->LineEdit_Username, SIGNAL(returnPressed()), ui->PushButton_login, SLOT(click()));
+    connect(ui->LineEdit_Password, SIGNAL(returnPressed()), ui->PushButton_login, SLOT(click()));
+    if(!dbManager::instance().isOpen())
+    {
+        qDebug() << "Successfully Connected to the Database";
+    }
+    else
+    {
+        qDebug() << "Successfully Connected to the Database";
+    }
 }
 
 MainWindow::~MainWindow()
@@ -15,44 +25,33 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-/*******************************************************
- * on_loginPushBtn_clicked() -
- *  This function error checks for right username and
- *  password. If admin logs in, then the program will
- *  display the admin page. If store manager logs in
- *  the program will display the store manager page
- *******************************************************/
-void MainWindow::on_loginPushBtn_clicked()
+void MainWindow::on_PushButton_login_clicked()
 {
-    QString username = ui->usernameLineEdit->text();
-    QString password = ui->passwordLineEdit->text();
+    QString employeeType;
+    Manager manager;
+    Admin admin;
 
-    if(username == "admin" && password == "admin")
+    if(dbManager::instance().VerifyLogin(Credentials(ui->LineEdit_Username->text(),
+                                                     ui->LineEdit_Password->text()), employeeType))
     {
-        // Changes to admin page
-        qDebug() << "Access granted";
-        adminObj.show();
-    }
-    else if(username == "storemanager" && password == "storemanager")
+        if(employeeType == "administrator")
+        {
+            QMessageBox::information(NULL,"Hello","Welcome to the Administration Page","OK");
+            admin.setModal(true);
+            admin.exec();
+            hide();
+        }
+        else if(employeeType == "store_manager")
+        {
+            QMessageBox::information(NULL,"Hello","Welcome to the Store Manager Page","OK");
+            manager.setModal(true);
+            manager.exec();
+            hide();
+        }
+    }else
     {
-        // Changes to store manager page
-        qDebug() << "Access granted";
-        storeObj.show();
+         QMessageBox::information(NULL,"Try Again","Invalid username or password","OK");
+         ui->LineEdit_Username->setText("");
+         ui->LineEdit_Password->setText("");
     }
-    else
-    {
-        // Displays error message
-        QMessageBox::warning(this, "Login", "Username or password is not correct");
-    }
-}
-
-/*******************************************************
- * on_clearPushBtn_clicked() -
- *  Once a user presses the clear button, it will clear
- *  the username and password line edits
- *******************************************************/
-void MainWindow::on_clearPushBtn_clicked()
-{
-    ui->usernameLineEdit->clear();
-    ui->passwordLineEdit->clear();
 }

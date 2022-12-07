@@ -16,23 +16,43 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    adminpage.cpp \
+    AddNewItem.cpp \
+    AddNewMembers.cpp \
+    AddNewPurchase.cpp \
+    Admin.cpp \
+    ConfirmRemoval.cpp \
+    Manager.cpp \
+    Models.cpp \
+    ModifyItem.cpp \
+    dbManager.cpp \
     main.cpp \
-    mainwindow.cpp \
-    storemanagerpage.cpp \
-    yesno.cpp
+    mainwindow.cpp
 
 HEADERS += \
-    adminpage.h \
-    mainwindow.h \
-    storemanagerpage.h \
-    yesno.h
+    AddNewItem.h \
+    AddNewMembers.h \
+    AddNewPurchase.h \
+    Admin.h \
+    ConfirmRemoval.h \
+    Credentials.h \
+    Item.h \
+    Manager.h \
+    Member.h \
+    Models.h \
+    ModifyItem.h \
+    Purchase.h \
+    dbManager.h \
+    mainwindow.h
 
 FORMS += \
-    adminpage.ui \
-    mainwindow.ui \
-    storemanagerpage.ui \
-    yesno.ui
+    AddNewItem.ui \
+    AddNewMembers.ui \
+    AddNewPurchase.ui \
+    Admin.ui \
+    ConfirmRemoval.ui \
+    Manager.ui \
+    ModifyItem.ui \
+    mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

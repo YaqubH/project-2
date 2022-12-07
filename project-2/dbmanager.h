@@ -1,156 +1,78 @@
 #ifndef DBMANAGER_H
 #define DBMANAGER_H
 
-#include <QObject>
 #include <QtSql>
+#include <QList>
+#include <QFile>
+#include <QString>
+#include <fstream>
+#include <string>
+#include "Credentials.h"
+#include "Member.h"
+#include "Purchase.h"
+#include "Item.h"
+using namespace std;
 
-class DBManager
+
+class dbManager
 {
 public:
-    DBManager();
-    ~DBManager();
+    static dbManager& instance();
+    dbManager(const dbManager&) = delete;
+    void operator=(const dbManager&) = delete;
 
-    /*******************************************************
-    * loadEntries() -
-    *  This function helps the program read the contents.
-    *  from the database. This function primarily uses
-    *  the query function, "select * from". The database
-    *  in which it is selected from is called customer.
-    *  Throughout the process, the data returned is
-    *  is stored in the table created in createTable().
-    *  If the database or data has trouble storing the
-    *  values, it will output "error loading values to
-    *  db". Returns pointer
-    *******************************************************/
-    QSqlQueryModel *loadEntries();
+    bool VerifyLogin(const Credentials& credentials, QString& employeeType);
 
-    /*******************************************************
-    * loadEntriesByDate(QString date) -
-    *   STORY #1
-    *   This function will return a query model based
-    *   on a certain date. Will return the table that
-    *   displays a sales report for any given day.
-    *******************************************************/
-    QSqlQueryModel *loadEntriesByDate(QString date);
+    bool AddMember(const Member& newMember);
+    bool RemoveMember(const Member& member);
+    bool MemberExists(const int memberID);
+    Member GetMember(int memberID);
+    QList<Member> GetAllMembers();
+    QList<Member> GetUpgrades();
+    QList<Member> GetDowngrades();
+    QList<Member> GetExpirations(int month);
+    QList<Member> GetRebates();
 
-    /*******************************************************
-    * GetTotalRevenue(QString date) -
-    *   STORY #1/3
-    *   Depending on the date input, this function will
-    *   obtain the total revenue from a given date from
-    *   the database. If date is empty, then the total
-    *   revenue will be the grand total of all the purchases
-    *   from all customers. RETURNS total revenue
-    *******************************************************/
-    double GetTotalRevenue(QString date);
+    bool AddPurchase(const Purchase& newPurchase);
+    bool PurchaseExists(const Purchase& Purchase);
+    bool PurchaseUpdateInventory(const Purchase newPurchase);
+    bool PurchaseUpdateMemberTotalSpent(const Purchase newPurchase);
+    bool PurchaseUpdateMemberRebate(const Purchase newPurchase);
+    QList<Purchase> GetAllPurchases();
 
-    /*******************************************************
-    * loadEntriesByType(QString date, QString memberType)=
-    *   This function loads all the entries from the database
-    *   by membership type. date and memberType are passed
-    *   in to determine whether all the entries of either the
-    *   executive or regular customers will be displayed
-    *   (entire week) or all the entries of either the
-    *   executive or regular customers from a certain day.
-    *   RETURNS QSqlQueryModel
-    *******************************************************/
-    QSqlQueryModel *loadEntriesByType(QString date, QString memberType);
+    float CalcGrossSales();
+    float CalcGrossSalesByDate(QDate tDate);
+    float CalcGrossSalesByMember(int buyersID);
+    float CalcGrossSalesByMember(QString bName);
+    float CalcGrossSalesByMember(MemberType mType);
+    float CalcGrossSalesByItem(QString itemName);
+    int GetTotalShoppers(MemberType mType);
+    int GetTotalShoppersByDate(QDate, MemberType mType);
+    int GetTotalShoppersByItem(QString itemName, MemberType mType);
+    int GetTotalQuantity();
+    int GetTotalQuantityByDate(QDate tDate);
+    int GetTotalQuantityByMember(int buyersID);
+    int GetTotalQuantityByMember(QString bName);
+    int GetTotalQuantityByMember(MemberType mType);
+    int GetTotalQuantityByItem(QString itemName);
 
-    /*******************************************************
-    *ReturnMemberTypeCount(QString date, QString memberType)-
-    *   Depending on the date and memberType, this function
-    *   will count either the executive or regular members
-    *   from the database. If date is empty, it will count
-    *   both members throughout the entire week. Otherwise,
-    *   it will count the number of members based on a certain
-    *   day
-    *   RETURNS memberCount (int)
-    *******************************************************/
-    int ReturnMemberTypeCount(QString date,QString memberType);
+    bool AddItem(const Item& newItem);
+    bool RemoveItem(const Item& item);
+    bool ItemExists(const Item& item) const;
+    Item GetItem(QString itemName);
+    float GetItemPrice(QString itemName);
+    QList<Item> GetAllItems();
+    QStringList GetAllItemNames();
+    bool  modifyItem(const Item& item);
 
-    /*******************************************************
-    * loadDateEntriesOnly()-
-    *  This function returns a QSqlQueryModel consisting
-    *  of only the purchaseDate entries from the
-    *  dailySalesReport table in the database.
-    *  This function will be called by the store manager to
-    *  set the date combo box to the returned model
-    *  RETURNS QSqlQueryModel
-    *******************************************************/
-    QSqlQueryModel *loadDateEntriesOnly();
+    bool isOpen() const;
 
-    //---------------------STORY 2 & 3 CODE------------------------------
-    /*******************************************************
-    *loadTotalMemberOrItemPurchases(QString decider)-
-    *   Depending on the given decider string, this function
-    *   will load the total purchases from all members or
-    *   total purchases of all items
-    *   RETURNS model (QSqlQueryModel)
-    *******************************************************/
-    QSqlQueryModel *loadTotalMemberOrItemPurchases(QString decider);
-
-    //----------------------Story 9 and 10--------------------------------//
-    /*******************************************************
-    * *loadItemsOnly() -
-    *  This function returns a QSqlQueryModel consisting
-    *  of only the item entries from the database. The entries
-    *  will be returned via QSqlQueryModel in order to set the
-    *  item combo box to the specific item names
-    *  RETURNS QSqlQueryModel
-    *******************************************************/
-    QSqlQueryModel *loadItemsOnly();
-
-    /*******************************************************
-    * *loadNamesOnly() -
-    *  This function returns a QSqlQueryModel consisting
-    *  of only the member name entries from the database. The entries
-    *  will be returned via QSqlQueryModel in order to set the
-    *  name combo box to the specific member names
-    *  RETURNS QSqlQueryModel
-    *******************************************************/
-    QSqlQueryModel *loadNamesOnly();
-
-    /*******************************************************
-    * *ShowInfoForOneMember(QString name) -
-    *  This function returns a QSqlQueryModel consisting
-    *  of information about a single member by passing in
-    *   the name of the member
-    *******************************************************/
-    QSqlQueryModel *ShowInfoForOneMember(QString name);
-
-    /*******************************************************
-    * *ShowInfoForOneItem(QString item) -
-    *  This function returns a QSqlQueryModel consisting
-    *  of information about a single item by passing in
-    *   the name of the item
-    *******************************************************/
-    QSqlQueryModel *ShowInfoForOneItem(QString item);
-
-  // -----------------STORY 7 CODE-------------------------//
-    // This function adds new customers to the Customers table when admin is creating purchases
-    void AddToCustomersTable(QString name, QString id, QString type, int month, int day, int year);
-
-    // This function will add new customer info to the dailySalesReport table when admin is creating purchases
-    void AddToDailySalesReport(QString id, QString item, int quantity);
-
-    // This function returns the item price based on the itemName
-    double GetItemPrice(QString itemName);
-
-    //----------------END of Story 7 code-------------------//
-
-    //---------------------STORY 4 and 5 CODE---------------//
-       // This function will load the rebate table for executive members
-    QSqlQueryModel *LoadRebateModel();
-
-    // This function will load the expiration months into the exp month combo box
-    QSqlQueryModel *loadExpirationMonthsIntoComboBox();
-
-    // This function will return a model consisting of member information based on the given expiration month input
-    QSqlQueryModel *loadMemberInfoFromExpMonth(QString expMonth);
-    //-----------------------END OF STORY 4 and 5----------------------//
+    bool GetValidDates(QDate& earliestDate, QDate& latestDate);
 
 private:
-    QSqlDatabase m_database;
+    dbManager();
+    ~ dbManager();
+    QSqlDatabase bulkdb;
 };
 
 #endif // DBMANAGER_H
